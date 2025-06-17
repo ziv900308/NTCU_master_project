@@ -343,6 +343,10 @@ class AOPTransformer(ast.NodeTransformer):
                     print("================================================ Around source code ===========================================================")
                     print(ast.unparse(node))
 
+                    print("*************************************************************************************")
+                    print("Around advice: ", around_advice)
+                    print("*************************************************************************************")
+
                     node.decorator_list.insert(
                             0,
                             ast.Name(id=around_advice[0], ctx=ast.Load()) ###
@@ -350,6 +354,9 @@ class AOPTransformer(ast.NodeTransformer):
                     
                     print("======================================= Insert.... =========================================")
                     print(ast.unparse(node))
+
+                # Every function only have one sample Advice to execute
+                self.target_function.clear()
         
         self.has_return = False
         return node
@@ -416,8 +423,7 @@ class AST_Process:
         return compile_code
 
 
-    def Pointcut_Process(self, Filepath, Function):
-        print("Filepath: ", Filepath)
+    def Pointcut_Process(self, Filepath, Function):        
         code = open(Filepath, "r").read()
         self.source_tree = ast.parse(code)
         self.target_function = Function

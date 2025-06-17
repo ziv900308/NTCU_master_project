@@ -4,17 +4,118 @@ from AOP import *
 class Logging_Aspect:
     def __init__(self):
         print("This is Aspect code...")
-        
+
+    # ========== Question 1 ==========
+
+    # @Pointcut(Joinpoint="execution", Pattern="* Question1.sequential_search.search")
+    # def PointcutMethods(self):
+    #     pass
+
+    # @Around(PointcutMethods)
+    # def logAround(func, *args, **kwargs):
+    #     for i in range(len(args[1])):
+    #         if args[0] <= args[1][i]:
+    #             return i
+    #         else:
+    #             pass
+    #     return len(args[1])
+    
+    # ========== Question 2 ==========
+
+    @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.unique_day")
+    def PointcutMethods(self):
+        pass
+
+    @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.unique_month")
+    def PointcutMethods2(self):
+        pass
+
+    @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.contains_unique_day")
+    def PointcutMethods3(self):
+        pass
+
+    @Around(PointcutMethods)
+    def logAround(func, *args, **kwargs):
+        all_days = ()
+        for i in args[1]:
+            all_days += (i[1],)
+        return all_days.count(args[0]) == 1
+    
+    @Around(PointcutMethods2)
+    def logAround2(func, *args, **kwargs):
+        all_months = ()
+        for i in args[1]:
+            all_months += (i[0],)
+        return all_months.count(args[0]) == 1
+    
+    @Around(PointcutMethods3)
+    def logAround3(func, *args, **kwargs):
+        all_day_in_given_month = ()
+        for i in args[1]:
+            if i[0] == args[0]:
+                all_day_in_given_month += (i[1],)
+        for i in all_day_in_given_month:
+            if unique_day(i, args[1]):
+                return True
+        return False
+
+    # ========== Question 3 ==========
+
+    # @Pointcut(Joinpoint="execution", Pattern="* Question3.duplicate_elimination.remove_extras")
+    # def PointcutMethods(self):
+    #     pass
+
+    # @Around(PointcutMethods)
+    # def logAround(func, *args, **kwargs):
+    #     new_lst = []
+    #     for i in args[0]:
+    #         if i not in new_lst:
+    #             new_lst.append(i)
+    #         else:
+    #             continue
+    #     return new_lst
+
+    # ========== Question 4 ==========
+
+    # @Pointcut(Joinpoint="execution", Pattern="* Question4.sorting_tuples.sort_age")
+    # def PointcutMethods(self):
+    #     pass
+
+    # @Around(PointcutMethods)
+    # def logAround(func, *args, **kwargs):
+    #     output = []
+    #     for i in range(len(args[0])):
+    #         largest = max(args[0], key=lambda p: p[1])
+    #         args[0].remove(largest)
+    #         output.append(largest)
+    #     return output
+
+    # ========== Question 5 ==========
+
+    # @Pointcut(Joinpoint="execution", Pattern="* Question5.top_K.top_k")
+    # def PointcutMethods(self):
+    #     pass
+
+    # @Around(PointcutMethods)
+    # def logAround(func, *args, **kwargs):
+    #     res = []
+    #     for i in range(args[1]):
+    #         res.append(max(args[0]))
+    #         args[0].remove(max(args[0]))
+    #     return res
+
+
+    # =====================================================================================================================================================
+    
+
     #@Pointcut(Joinpoint="execution", Pattern="* Countdown_timer.main.countdown") #Pass
     #@Pointcut(Joinpoint="execution", Pattern="* Billing_system.biling_system.Bill_App.*(..)")
     #@Pointcut(Joinpoint="execution", Pattern="* Digital_clock.digital_clock.time")
     #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.app2.Animal.speak") #Pass
     #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.app5.Document.show") #Pass
     #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_test.app.Service.*(..)")
-    @Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.app6.error_function")
-    @Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.refactoring.search")
-    def PointcutMethods(self):
-        pass
+    #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.app6.error_function")
+
 
     # @Before(PointcutMethods)
     # def logBefore(func):
@@ -24,14 +125,7 @@ class Logging_Aspect:
     # def logAfter(func):
     #     print("This is logAfter...")
 
-    @Around(PointcutMethods)
-    def logAround(func, *args, **kwargs):
-        for i in range(len(args[1])):
-            if args[0] <= args[1][i]:
-                return i
-            else:
-                pass
-        return len(args[1])
+    
 
     # @Before(PointcutMethods)
     # def logBefore2():
