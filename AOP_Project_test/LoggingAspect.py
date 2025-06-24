@@ -1,5 +1,6 @@
 from AOP import *
 
+
 @Aspect
 class Logging_Aspect:
     def __init__(self):
@@ -22,42 +23,42 @@ class Logging_Aspect:
     
     # ========== Question 2 ==========
 
-    @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.unique_day")
-    def PointcutMethods(self):
-        pass
+    # @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.unique_day")
+    # def PointcutMethods(self):
+    #     pass
 
-    @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.unique_month")
-    def PointcutMethods2(self):
-        pass
+    # @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.unique_month")
+    # def PointcutMethods2(self):
+    #     pass
 
-    @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.contains_unique_day")
-    def PointcutMethods3(self):
-        pass
+    # @Pointcut(Joinpoint="execution", Pattern="* Question2.dates_and_months.contains_unique_day")
+    # def PointcutMethods3(self):
+    #     pass
 
-    @Around(PointcutMethods)
-    def logAround(func, *args, **kwargs):
-        all_days = ()
-        for i in args[1]:
-            all_days += (i[1],)
-        return all_days.count(args[0]) == 1
+    # @Around(PointcutMethods)
+    # def logAround(func, *args, **kwargs):
+    #     all_days = ()
+    #     for i in args[1]:
+    #         all_days += (i[1],)
+    #     return all_days.count(args[0]) == 1
     
-    @Around(PointcutMethods2)
-    def logAround2(func, *args, **kwargs):
-        all_months = ()
-        for i in args[1]:
-            all_months += (i[0],)
-        return all_months.count(args[0]) == 1
+    # @Around(PointcutMethods2)
+    # def logAround2(func, *args, **kwargs):
+    #     all_months = ()
+    #     for i in args[1]:
+    #         all_months += (i[0],)
+    #     return all_months.count(args[0]) == 1
     
-    @Around(PointcutMethods3)
-    def logAround3(func, *args, **kwargs):
-        all_day_in_given_month = ()
-        for i in args[1]:
-            if i[0] == args[0]:
-                all_day_in_given_month += (i[1],)
-        for i in all_day_in_given_month:
-            if unique_day(i, args[1]):
-                return True
-        return False
+    # @Around(PointcutMethods3)
+    # def logAround3(func, *args, **kwargs):
+    #     all_day_in_given_month = ()
+    #     for i in args[1]:
+    #         if i[0] == args[0]:
+    #             all_day_in_given_month += (i[1],)
+    #     for i in all_day_in_given_month:
+    #         if unique_day(i, args[1]):
+    #             return True
+    #     return False
 
     # ========== Question 3 ==========
 
@@ -115,6 +116,60 @@ class Logging_Aspect:
     #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.app5.Document.show") #Pass
     #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_test.app.Service.*(..)")
     #@Pointcut(Joinpoint="execution", Pattern="* AOP_Project_Test.app6.error_function")
+
+    # @Pointcut(Joinpoint="execution", Pattern="* Employees System Project.FrontendManager.FrontendManager.print_menu")
+    # @Pointcut(Joinpoint="execution", Pattern="* Employees System Project.EmployeesManager.EmployeesManager.list_employee")
+    # @Pointcut(Joinpoint="execution", Pattern="* Countdown_timer.main.countdown")
+    # @Pointcut(Joinpoint="execution", Pattern="* Employees System Project.FrontendManager.FrontendManager.*(..)")
+    # @Pointcut(Joinpoint="execution", Pattern="* tool.python_execute._run_code")
+    @Pointcut(Joinpoint="execution", Pattern="* utils.html.strip_tags")
+    def PointcutMethods(self):
+        pass
+
+    @Around(PointcutMethods)
+    def logAround(func, *args, **kwargs):
+        print("Args:", args)
+        func()
+
+    # @Around(PointcutMethods)
+    # def logAround(func, *args, **kwargs):
+    #     import re
+
+    #     BANNED_PATTERNS = [
+    #         r"\beval\s*\(",
+    #         r"\bexec\s*\(",
+    #         r"\bcompile\s*\(",
+    #         r"\b__import__\s*\(",
+    #         r"\bos\.system\s*\(",
+    #         r"\bos\.popen\s*\(",
+    #         r"\bsubprocess\.(call|run|Popen|check_output)\s*\(",
+    #     ]
+
+    #     warnings = []
+    #     for pattern in BANNED_PATTERNS:
+    #         matches = list(re.finditer(pattern, args[1]))
+    #         for match in matches:
+    #             line_no = args[1][:match.start()].count("\n") + 1
+    #             warnings.append((pattern, line_no))
+
+    #     if warnings:
+    #         print("*"*100)
+    #         print("Detect command injection:")
+    #         print("*"*100)
+    #         for pattern, line in warnings:
+    #             print(f" - pattern `{pattern}` at line {line}")
+    #         return
+        
+    #     print("*"*100)
+    #     print("This function is safe...")
+    #     print("*"*100)
+    #     func()
+
+        # print("Catch code information...:", args[1])
+        # if args[1] == 0:
+        #     print("This is not safe...")
+        # else: 
+        #     func()
 
 
     # @Before(PointcutMethods)

@@ -3,6 +3,9 @@ import autopep8
 import inspect
 from PatternSyntax import Pattern_Syntax_Process
 import textwrap
+from ScanModule import scan_module, scan_main
+import types
+import sys
 
 function_setting_array = []
 before_advice = []
@@ -267,9 +270,13 @@ class AOPTransformer(ast.NodeTransformer):
         self.target_function = target_function
         self.pointcut_define = pointcut_define
 
+        print("*************************************************************************************")
         print("Target class: ", target_class)
+        print("*************************************************************************************")
         print("Target function: ", target_function)
+        print("*************************************************************************************")
         print("Point define: ", pointcut_define)
+        print("*************************************************************************************")
 
     def insert_exit_print_in_returns(self, body, advice_ast):
         """在所有 return 前插入 exit print"""
@@ -356,7 +363,8 @@ class AOPTransformer(ast.NodeTransformer):
                     print(ast.unparse(node))
 
                 # Every function only have one sample Advice to execute
-                self.target_function.clear()
+                if pattern_syntax.get("class_name") == None:
+                    self.target_function.clear()
         
         self.has_return = False
         return node
@@ -423,8 +431,9 @@ class AST_Process:
         return compile_code
 
 
-    def Pointcut_Process(self, Filepath, Function):        
-        code = open(Filepath, "r").read()
+    def Pointcut_Process(self, Filepath, Function):     
+        with open(Filepath, encoding='utf-8') as f:
+            code = f.read()
         self.source_tree = ast.parse(code)
         self.target_function = Function
 
@@ -501,43 +510,64 @@ def Code_Process(code):
     advice_code = textwrap.dedent(advice_code)
     return autopep8.fix_code(advice_code)
 
-
-
-def Aspect(cls):
-    print(f"Catch class: {cls.__name__}...")
-    compile_code = Weaver(cls())
-    print("Code: ", compile_code)
-    exec(compile_code, globals())
-
-    return cls
-
-# def Pointcut(Joinpoint, Pattern, Filepath, Function):
-#     def decorator(func):
-#         def wrapper(*args, **kwargs):
-#             print(f"Function name: {func.__name__}")
-#             print(f"Joinpoint type: {Joinpoint}")
-#             print(f"Pattern: {Pattern}")
-#             print(f"Filepath: {Filepath}")
-#             print(f"Function: {Function}")
-
-#             ast_tree.Pointcut_Process(Filepath, Function)
-#             return func(*args, **kwargs)
-#         return wrapper
-#     return decorator
-
 #TODO class name need to be added
 def Pointcut(Joinpoint, Pattern):
     def decorator(func):
         def wrapper(*args, **kwargs):
             print(f"Function name: {func.__name__}")
             print(f"Joinpoint type: {Joinpoint}")
+
+            #TODO Need to modify writing type...
+            global pattern_syntax
             pattern_syntax = Pattern_Syntax_Process(Pattern)
             print("Pattern syntax: ", pattern_syntax)
 
+            scan_module(pattern_syntax.get("Filepath")) # import target module
             ast_tree.Pointcut_Process(pattern_syntax.get("Filepath"), pattern_syntax.get("Function"))
             return func(*args, **kwargs)
         return wrapper
     return decorator
+
+def Aspect(cls):
+    print(f"Catch class: {cls.__name__}...")
+    compile_code = Weaver(cls())
+    print("Code: ", compile_code)
+
+    print("=============================================== Module name ===============================================")
+    print("Module name:", pattern_syntax.get("Module"))
+
+    if pattern_syntax.get("Module").lower() == "main" or scan_main(pattern_syntax.get("Filepath")) == None:
+        main_globals = {"__name__": "__main__"}
+        exec(compile_code, main_globals)
+    
+    else:
+        module_name = pattern_syntax.get("Module")
+        frontend_mod = types.ModuleType(module_name)
+        frontend_mod.__name__ = module_name
+
+        # 執行改寫後的 AST 程式碼到模組中
+        exec(compile_code, frontend_mod.__dict__)
+
+        # 將這個模組掛到 sys.modules，取代 import 使用的版本
+        sys.modules[module_name] = frontend_mod
+
+        print("=============================================== Main execution ===============================================")
+
+        with open(scan_main(pattern_syntax.get("Filepath")), "r", encoding="utf-8") as f:
+            main_code = f.read()
+
+        print("=============================================== Main function ===============================================")
+        print(main_code)
+        print("=============================================== Execution ===============================================")
+
+        main_tree = ast.parse(main_code)
+        main_compiled = compile(main_tree, filename="Main.py", mode="exec")
+
+        # 不使用 exec_globals，而是直接在主命名空間執行
+        main_globals = {"__name__": "__main__"}
+        exec(main_compiled, main_globals)
+
+    return cls
 
 def Before(param_func):
     def decorator(func):

@@ -4,3 +4,4 @@ def search(x, seq):
             return i
     return len(seq)
 
+print(search(-5, (1, 5, 10)))
